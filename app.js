@@ -42,34 +42,83 @@ const pick = (a) => a[Math.floor(rand() * a.length)];
 const sample = (a, n) => shuffle(a).slice(0, n);
 const motionOK = () => state.settings.motion && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------- Suara: Text-to-Speech (Bahasa Indonesia) ---------- */
+/* ---------- Suara: klip Bahasa Indonesia + cadangan TTS ----------
+   Aplikasi memutar klip suara Indonesia (folder /audio, suara
+   "Damayanti") agar pelafalan benar & SAMA di semua perangkat.
+   Bila sebuah klip tidak ada, dipakai Text-to-Speech bawaan
+   perangkat sebagai cadangan. */
+const AUDIO = new Set();              // slug klip yang tersedia
+function slugify(t) {
+  return String(t).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+async function loadAudioIndex() {
+  try {
+    const res = await fetch("audio/index.json", { cache: "force-cache" });
+    (await res.json()).forEach(s => AUDIO.add(s));
+  } catch (e) {}
+}
+
+// pemutar klip (satu elemen Audio dipakai ulang)
+let clipEl = null;
+function clip() { if (!clipEl) { clipEl = new Audio(); clipEl.preload = "auto"; } return clipEl; }
+function stopClip() { try { const a = clip(); a.onended = null; a.pause(); } catch (e) {} }
+
+// Text-to-Speech cadangan
 let idVoice = null;
 function loadVoices() {
   const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
-  idVoice = voices.find(v => /id[-_]ID/i.test(v.lang)) ||
-            voices.find(v => /indones/i.test(v.name)) ||
-            voices.find(v => /^id/i.test(v.lang)) || null;
+  idVoice = voices.find(v => /damayanti/i.test(v.name)) ||
+            voices.find(v => /id[-_]ID/i.test(v.lang) && /natural|neural|enhanced|google/i.test(v.name)) ||
+            voices.find(v => /id[-_]ID/i.test(v.lang)) ||
+            voices.find(v => /indones/i.test(v.name)) || null;
 }
-if (window.speechSynthesis) {
-  loadVoices();
-  speechSynthesis.onvoiceschanged = loadVoices;
-}
-function speak(text, { rate = 0.84 } = {}) {
-  if (!state.settings.tts || !window.speechSynthesis || !text) return;
+if (window.speechSynthesis) { loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
+function ttsSpeak(text, rate = 0.84) {
+  if (!window.speechSynthesis) return;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "id-ID";       // pastikan pelafalan Bahasa Indonesia
-    u.rate = rate;          // lebih lambat & jelas untuk anak
-    u.pitch = 1.05;
+    u.lang = "id-ID"; u.rate = rate; u.pitch = 1.05;
     if (idVoice) u.voice = idVoice;
     speechSynthesis.speak(u);
   } catch (e) {}
 }
+
+// ucapkan satu teks (klip bila ada, kalau tidak TTS)
+function speak(text) {
+  if (!state.settings.tts || !text) return;
+  stopClip();
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  const s = slugify(text);
+  if (AUDIO.has(s)) {
+    const a = clip(); a.onended = null;
+    a.src = "audio/" + s + ".mp3"; a.currentTime = 0;
+    a.play().catch(() => ttsSpeak(text));
+  } else {
+    ttsSpeak(text);
+  }
+}
+
+// ucapkan rangkaian kata berurutan (Papan Bicara)
+function speakSequence(words) {
+  if (!state.settings.tts || !words || !words.length) return;
+  stopClip();
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  if (!words.every(w => AUDIO.has(slugify(w)))) { ttsSpeak(words.join(" ")); return; }
+  const a = clip(); let i = 0;
+  const next = () => {
+    if (i >= words.length) { a.onended = null; return; }
+    a.onended = next;
+    a.src = "audio/" + slugify(words[i++]) + ".mp3"; a.currentTime = 0;
+    a.play().catch(() => { a.onended = null; });
+  };
+  next();
+}
+
 // info suara untuk dasbor orang tua
 function voiceInfo() {
   loadVoices();
-  return { found: !!idVoice, name: idVoice ? idVoice.name : null };
+  return { clips: AUDIO.size, ttsFound: !!idVoice, ttsName: idVoice ? idVoice.name : null };
 }
 
 /* ---------- Suara: efek nada lembut (Web Audio) ---------- */
@@ -99,7 +148,12 @@ const soundTry     = () => tone([392.0, 329.63], 0.18, 0.08);       // turun lem
 const soundTap     = () => tone([440], 0.08, 0.06);
 
 /* unlock audio + voices saat sentuhan pertama */
-function primeAudio() { audio(); loadVoices(); window.removeEventListener("pointerdown", primeAudio); }
+function primeAudio() {
+  audio(); loadVoices();
+  // buka kunci pemutaran klip MP3 (butuh gestur pengguna di seluler)
+  try { const a = clip(); a.src = "audio/_silence.mp3"; a.play().then(() => a.pause()).catch(() => {}); } catch (e) {}
+  window.removeEventListener("pointerdown", primeAudio);
+}
 window.addEventListener("pointerdown", primeAudio);
 
 /* ---------- Bintang & Lencana ---------- */
@@ -376,7 +430,7 @@ function onPick(btn) {
     btn.classList.add("right");
     soundCorrect();
     if (motionOK()) btn.classList.add("pop");
-    if (g.cfg.isCount) speak(`Benar! Ada ${DATA.numberWords[g.countN]}.`);
+    if (g.cfg.isCount) speak(DATA.numberWords[g.countN]);
     else if (g.cfg.onCorrect && g.target) g.cfg.onCorrect(g.target);
     else speak(pick(["Hebat!", "Bagus!", "Pintar!", "Benar!", "Keren!"]));
     g.earned += 1; g.round += 1;
@@ -417,7 +471,7 @@ function celebrate(stars) {
         <button class="big-btn ghost" onclick="go('home')">🏠 Beranda</button>
       </div>
     </div>`;
-  speak(`Hebat! Kamu dapat ${stars} bintang.`);
+  speak("Hebat!");
 }
 
 function confetti() {
@@ -523,9 +577,8 @@ function renderAAC() {
       </div>`;
 
     $("#sayStrip").onclick = () => {
-      const sentence = strip.map(w => w.text).join(" ");
-      if (!sentence) return;
-      speak(sentence, { rate: 0.92 });
+      if (!strip.length) return;
+      speakSequence(strip.map(w => w.text));
       state.usedAac = true; awardBadge("jagoan_bicara"); save(); flushBadges();
     };
     $("#delStrip").onclick = () => { strip.pop(); draw(); };
@@ -681,13 +734,13 @@ function renderParent() {
 
       <h3 class="p-h">Suara Bahasa Indonesia</h3>
       <div class="p-voice">
-        <div class="p-voice-status ${vi.found ? "ok" : "warn"}">
-          ${vi.found ? "✅ Suara Indonesia aktif" : "⚠️ Suara Indonesia belum tersedia"}
+        <div class="p-voice-status ${vi.clips ? "ok" : "warn"}">
+          ${vi.clips ? "✅ Suara Indonesia bawaan aplikasi" : "⏳ Memuat suara…"}
         </div>
         <div class="p-voice-note">
-          ${vi.found
-            ? `Memakai suara: <b>${vi.name}</b>`
-            : `Teks tetap tampil. Agar terdengar dalam Bahasa Indonesia, buka <b>Pengaturan HP → Bahasa &amp; Masukan → Keluaran Teks-ke-Ucapan</b> dan pasang paket suara <b>Bahasa Indonesia</b>.`}
+          Aplikasi memakai rekaman suara Bahasa Indonesia sendiri${vi.clips ? ` (${vi.clips} kata &amp; kalimat)` : ""},
+          sehingga pelafalannya benar dan sama di setiap perangkat — tidak bergantung pada suara bawaan HP.
+          ${vi.ttsFound ? `<br>Cadangan suara perangkat: <b>${vi.ttsName}</b>.` : ""}
         </div>
         <button class="test-voice-btn" id="testVoice">🔊 Tes Suara</button>
       </div>
@@ -779,6 +832,7 @@ const ROUTES = {
 
 /* ---------- Mulai ---------- */
 window.addEventListener("DOMContentLoaded", () => {
+  loadAudioIndex();          // muat daftar klip suara Indonesia
   renderHome();
   // daftarkan service worker untuk mode offline
   if ("serviceWorker" in navigator) {

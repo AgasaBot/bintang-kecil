@@ -1,7 +1,7 @@
 /* Bintang Kecil — service worker untuk mode offline.
    Strategi: cache-first untuk berkas aplikasi (cache-on-install),
    network-first untuk sisanya dengan fallback ke cache. */
-const CACHE = "bintang-kecil-v2";
+const CACHE = "bintang-kecil-v3";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,7 +10,11 @@ const ASSETS = [
   "./app.js",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./audio/index.json",
+  "./audio/_silence.mp3",
 ];
+// Klip suara di /audio/*.mp3 di-cache otomatis saat pertama diputar
+// (lihat handler fetch di bawah), lalu tersedia offline.
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
