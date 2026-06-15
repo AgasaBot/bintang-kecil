@@ -1,5 +1,8 @@
 # Bintang Kecil ⭐
 
+**🔗 Buka aplikasinya: <https://agasabot.github.io/bintang-kecil/>**
+(buka di HP/tablet, lalu pilih **"Tambahkan ke Layar Utama"** agar seperti aplikasi sungguhan)
+
 Aplikasi belajar **berbahasa Indonesia** untuk anak dengan **autisme dan kebutuhan khusus** —
 terinspirasi oleh Otsimo, tetapi dibuat khusus untuk anak-anak Indonesia.
 
