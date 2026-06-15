@@ -50,11 +50,28 @@ Situs statis murni — **tanpa build step**, sama seperti situs CYE.
 | `index.html` | Kerangka halaman |
 | `styles.css` | Sistem desain ramah anak |
 | `data.js` | Semua materi (warna, hewan, kata, kartu AAC, rutinitas, lencana) dalam Bahasa Indonesia |
-| `app.js` | Mesin aplikasi: navigasi, permainan, suara (TTS + efek), bintang/lencana, dasbor |
+| `app.js` | Mesin aplikasi: navigasi, permainan, suara, bintang/lencana, dasbor |
+| `audio/` | **Klip suara Bahasa Indonesia** (MP3) untuk tiap kata, perintah & kalimat |
+| `tools/gen-audio.js` | Pembuat berkas `audio/` (dijalankan di macOS) |
 | `manifest.webmanifest` · `sw.js` · `icon.svg` | Agar bisa di-*install* & dipakai offline (PWA) |
 
-Suara memakai **Web Speech API** bawaan perangkat (bahasa `id-ID`). Bila perangkat belum
-punya suara Indonesia, teks tetap tampil; suara Indonesia bisa ditambahkan di pengaturan HP.
+### Suara Bahasa Indonesia
+
+Agar pelafalan benar dan **sama di semua perangkat**, aplikasi tidak mengandalkan suara
+bawaan HP (yang sering jatuh ke suara Inggris bila suara Indonesia belum terpasang).
+Sebagai gantinya, aplikasi **memutar klip MP3 berbahasa Indonesia** yang sudah disiapkan
+(suara *Damayanti*, `id-ID`). Suara bawaan perangkat hanya dipakai sebagai cadangan.
+
+Membuat ulang berkas suara (mis. setelah menambah kata di `data.js`) — butuh **macOS**
+(memakai perintah `say` + `ffmpeg`):
+
+```bash
+node tools/gen-audio.js   # menulis ulang folder audio/ lalu commit
+```
+
+> Untuk kualitas suara terbaik di masa depan, klip bisa diganti dengan rekaman suara
+> manusia atau TTS neural berlisensi — aplikasi hanya memutar berkas dari `audio/`,
+> jadi penggantian cukup menimpa berkasnya.
 
 ## Jalankan secara lokal
 
