@@ -1,0 +1,305 @@
+/* ============================================================
+   Bintang Kecil — desain ramah anak & ramah autisme
+   Prinsip: warna lembut, sasaran sentuh besar, sedikit gangguan,
+   umpan balik jelas, animasi bisa dimatikan.
+   ============================================================ */
+
+:root{
+  --bg:#fbf7ef;          /* krem hangat, lembut di mata */
+  --surface:#ffffff;
+  --ink:#3a3850;         /* gelap lembut, bukan hitam pekat */
+  --muted:#857fa0;
+  --line:#ece6da;
+
+  --primary:#5bb8a6;     /* teal tenang */
+  --primary-deep:#2f9183;
+  --accent:#ffc94d;      /* kuning bintang */
+  --good:#6fcf97;        /* hijau benar */
+  --gentle:#f0a868;      /* oranye lembut untuk "coba lagi" — tidak menakutkan */
+
+  --pink:#ffd7e8;  --pink-d:#e6649b;
+  --blue:#d8ecfb;  --blue-d:#3f86c9;
+  --green:#d6f2df; --green-d:#3aa564;
+  --yellow:#fdeecb;--yellow-d:#d49a16;
+  --orange:#ffe2cc;--orange-d:#e07b32;
+  --purple:#e9e0fb;--purple-d:#8257d6;
+  --teal:#cdeee8; --teal-d:#2f9183;
+
+  --r:22px; --r-lg:30px;
+  --shadow:0 10px 30px -12px rgba(58,56,80,.28);
+  --shadow-sm:0 4px 14px -6px rgba(58,56,80,.25);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --maxw:560px;          /* fokus, tidak terlalu lebar */
+}
+
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#1d1b2a; --surface:#272336; --ink:#f1eefb; --muted:#a79fc4; --line:#3a3550; }
+}
+
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"Nunito","Baloo 2",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior:none;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{display:block;max-width:100%}
+
+#app{max-width:var(--maxw);margin:0 auto;min-height:100%;padding:0 18px 32px;
+  display:flex;flex-direction:column}
+
+/* ---------- Bilah atas ---------- */
+.topbar{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:12px;
+  padding:14px 2px;margin-bottom:6px;
+  background:linear-gradient(var(--bg) 70%, transparent);
+}
+.iconbtn{
+  width:54px;height:54px;border-radius:18px;background:var(--surface);
+  font-size:26px;display:grid;place-items:center;box-shadow:var(--shadow-sm);
+  transition:transform .15s var(--ease);
+}
+.iconbtn:active{transform:scale(.92)}
+.topbar-title{flex:1;font-size:22px;font-weight:800;letter-spacing:-.01em}
+.star-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--surface);border-radius:999px;padding:8px 16px;
+  font-weight:800;font-size:18px;box-shadow:var(--shadow-sm);color:var(--accent-d,#d49a16);
+}
+.star-chip .star-ic{font-size:18px}
+.star-chip.big{font-size:20px;padding:10px 18px}
+
+/* ---------- Beranda ---------- */
+.home-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 2px 10px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-star{font-size:40px;filter:drop-shadow(0 4px 8px rgba(255,201,77,.5))}
+.brand-name{font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:1}
+.brand-sub{font-size:14px;color:var(--muted);font-weight:600}
+
+.home{flex:1}
+.group-title{font-size:18px;font-weight:800;margin:22px 4px 12px;color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:360px){.grid{grid-template-columns:repeat(2,1fr)}}
+
+.tile{
+  aspect-ratio:1/1;border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+  background:var(--surface);box-shadow:var(--shadow-sm);
+  transition:transform .15s var(--ease),box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.tile:active{transform:scale(.94)}
+.tile-emoji{font-size:46px;line-height:1}
+.tile-label{font-size:15px;font-weight:800;color:var(--ink)}
+.t-pink{background:var(--pink)}    .t-pink .tile-label{color:var(--pink-d)}
+.t-blue{background:var(--blue)}    .t-blue .tile-label{color:var(--blue-d)}
+.t-green{background:var(--green)}  .t-green .tile-label{color:var(--green-d)}
+.t-yellow{background:var(--yellow)}.t-yellow .tile-label{color:var(--yellow-d)}
+.t-orange{background:var(--orange)}.t-orange .tile-label{color:var(--orange-d)}
+.t-purple{background:var(--purple)}.t-purple .tile-label{color:var(--purple-d)}
+.t-teal{background:var(--teal)}    .t-teal .tile-label{color:var(--teal-d)}
+
+.home-foot{padding:26px 0 8px;text-align:center}
+.parent-btn{
+  background:var(--surface);border-radius:999px;padding:14px 24px;
+  font-weight:800;font-size:16px;color:var(--muted);box-shadow:var(--shadow-sm);
+}
+.parent-btn:active{transform:scale(.96)}
+
+/* ---------- Permainan ---------- */
+.game{flex:1;display:flex;flex-direction:column;align-items:center}
+.prompt{display:flex;align-items:center;gap:12px;margin:8px 0 18px;max-width:460px;width:100%;justify-content:center}
+.prompt-say{
+  width:56px;height:56px;border-radius:50%;background:var(--primary);color:#fff;
+  font-size:26px;display:grid;place-items:center;box-shadow:var(--shadow-sm);flex:none;
+}
+.prompt-say:active{transform:scale(.9)}
+.prompt-text{font-size:24px;font-weight:800;text-align:left;letter-spacing:-.01em}
+.prompt-text.center{text-align:center;margin:6px 0 20px}
+
+.stage{width:100%;display:flex;justify-content:center;margin-bottom:18px}
+.count-area{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:340px;
+  background:var(--surface);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.count-item{font-size:40px;line-height:1}
+
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:460px}
+.options.four{grid-template-columns:repeat(2,1fr)}
+.opt{
+  aspect-ratio:1/1;border-radius:var(--r);background:var(--surface);
+  display:grid;place-items:center;box-shadow:var(--shadow);
+  transition:transform .15s var(--ease),box-shadow .2s,outline-color .2s;
+  outline:4px solid transparent;
+}
+.opt:active{transform:scale(.94)}
+.opt.right{outline-color:var(--good);box-shadow:0 0 0 6px rgba(111,207,151,.25),var(--shadow)}
+.opt.wrong{outline-color:var(--gentle)}
+.emoji-big{font-size:60px;line-height:1}
+.num{font-size:64px;font-weight:900;color:var(--primary-deep)}
+.swatch{width:64px;height:64px;border-radius:50%}
+.shape{width:74px;height:74px;display:block}
+
+.rounds{display:flex;gap:8px;margin-top:24px}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--line);transition:background .3s}
+.dot.on{background:var(--accent)}
+
+/* animasi (dimatikan bila motion off) */
+.pop{animation:pop .35s var(--ease)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.18)}100%{transform:scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+
+/* ---------- Perayaan ---------- */
+.celebrate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px 0}
+.cele-face{font-size:96px;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.cele-title{font-size:38px;font-weight:900;color:var(--primary-deep)}
+.cele-sub{font-size:22px;color:var(--ink)}
+.cele-actions{display:flex;flex-direction:column;gap:12px;margin-top:14px;width:100%;max-width:300px}
+.big-btn{padding:18px 24px;border-radius:var(--r);font-size:19px;font-weight:800;box-shadow:var(--shadow-sm)}
+.big-btn.primary{background:var(--primary);color:#fff}
+.big-btn.ghost{background:var(--surface);color:var(--ink)}
+.big-btn:active{transform:scale(.96)}
+
+.confetti{position:fixed;top:-20px;width:12px;height:16px;border-radius:3px;z-index:50;
+  animation:fall 2.4s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.9}}
+
+/* ---------- Mencocokkan ---------- */
+.match-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;width:100%;max-width:420px}
+.match-grid.cols4{grid-template-columns:repeat(4,1fr)}
+.card{aspect-ratio:1/1;border-radius:18px;position:relative;background:transparent}
+.card-back,.card-front{position:absolute;inset:0;display:grid;place-items:center;border-radius:18px;
+  backface-visibility:hidden;transition:transform .35s var(--ease)}
+.card-back{background:var(--primary);color:#fff;font-size:30px;box-shadow:var(--shadow-sm)}
+.card-front{background:var(--surface);font-size:42px;transform:rotateY(180deg);box-shadow:var(--shadow-sm)}
+.card.flip .card-back{transform:rotateY(180deg)}
+.card.flip .card-front{transform:rotateY(0)}
+.card.done .card-front{outline:4px solid var(--good);opacity:.96}
+.card.done{animation:pop .3s var(--ease)}
+
+/* ---------- Papan Bicara (AAC) ---------- */
+.aac{flex:1;display:flex;flex-direction:column;gap:14px}
+.strip{background:var(--surface);border-radius:var(--r);padding:12px;box-shadow:var(--shadow-sm);
+  display:flex;flex-direction:column;gap:10px}
+.strip-words{min-height:64px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px}
+.strip-hint{color:var(--muted);font-size:16px;font-weight:600}
+.chip{background:var(--teal);color:var(--teal-d);font-weight:800;font-size:18px;
+  padding:10px 14px;border-radius:14px}
+.strip-actions{display:flex;gap:8px}
+.rbtn{flex:none;background:var(--surface);border-radius:14px;padding:12px 16px;font-size:18px;font-weight:800;box-shadow:var(--shadow-sm)}
+.rbtn:active{transform:scale(.95)}
+.rbtn.say{flex:1;background:var(--primary);color:#fff}
+.rbtn.del{background:var(--yellow);color:var(--yellow-d)}
+.rbtn.clr{background:var(--orange);color:var(--orange-d)}
+
+.aac-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.aac-tab{flex:none;background:var(--surface);border-radius:999px;padding:10px 16px;font-weight:800;font-size:15px;
+  color:var(--muted);box-shadow:var(--shadow-sm);white-space:nowrap}
+.aac-tab.on{background:var(--primary);color:#fff}
+
+.aac-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.aac-card{background:var(--surface);border-radius:18px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow-sm)}
+.aac-card:active{transform:scale(.94)}
+.aac-card .emoji-big{font-size:42px}
+.aac-word{font-size:15px;font-weight:800;text-align:center}
+
+/* ---------- Rutinitas ---------- */
+.routine{flex:1;display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:6px}
+.routine-dots{display:flex;gap:10px}
+.routine-card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  width:100%;max-width:380px;padding:36px 24px;text-align:center;display:flex;flex-direction:column;gap:18px;align-items:center}
+.routine-emoji{font-size:110px;line-height:1}
+.routine-text{font-size:24px;font-weight:800}
+.routine-nav{display:flex;gap:12px;align-items:center;width:100%;max-width:380px;justify-content:center}
+.routine-nav .rbtn{font-size:20px}
+.rbtn.next,.rbtn.done{flex:1;background:var(--primary);color:#fff;text-align:center}
+.rbtn[disabled]{opacity:.4}
+
+/* ---------- Gerbang Orang Tua ---------- */
+.gate{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:30px 0}
+.gate-lock{font-size:60px}
+.gate-q{font-size:22px;font-weight:800}
+.gate-opts{display:flex;gap:14px}
+.gate-opt{width:84px;height:84px;border-radius:20px;background:var(--surface);font-size:34px;font-weight:900;
+  color:var(--primary-deep);box-shadow:var(--shadow)}
+.gate-opt:active{transform:scale(.94)}
+.gate-opt.wrong{outline:4px solid var(--gentle)}
+.gate-hint{font-size:14px;color:var(--muted)}
+
+/* ---------- Dasbor Orang Tua ---------- */
+.parent{flex:1;padding-bottom:20px}
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px}
+.p-stat{background:var(--surface);border-radius:var(--r);padding:18px 8px;text-align:center;box-shadow:var(--shadow-sm)}
+.p-num{font-size:32px;font-weight:900;color:var(--primary-deep)}
+.p-lab{font-size:13px;font-weight:700;color:var(--muted);margin-top:2px}
+.p-h{font-size:18px;font-weight:800;margin:24px 4px 12px}
+
+.p-progress{display:flex;flex-direction:column;gap:14px}
+.p-row{background:var(--surface);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-sm)}
+.p-row-top{display:flex;justify-content:space-between;font-weight:800;font-size:15px;margin-bottom:8px}
+.p-pct{color:var(--primary-deep)}
+.p-bar{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.p-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:999px;transition:width .5s var(--ease)}
+.p-meta{font-size:12px;color:var(--muted);margin-top:6px}
+
+.p-badges{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.p-badge{background:var(--surface);border-radius:16px;padding:14px 8px;text-align:center;box-shadow:var(--shadow-sm);opacity:.45;filter:grayscale(.7)}
+.p-badge.got{opacity:1;filter:none}
+.p-badge-ic{font-size:38px}
+.p-badge-t{font-size:13px;font-weight:800;margin-top:4px}
+.p-badge-d{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+
+.p-settings{display:flex;flex-direction:column;gap:10px}
+.p-set-row{background:var(--surface);border-radius:16px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:15px;box-shadow:var(--shadow-sm)}
+.switch{width:58px;height:34px;border-radius:999px;background:var(--line);position:relative;transition:background .2s;flex:none}
+.switch.on{background:var(--primary)}
+.switch .knob{position:absolute;top:4px;left:4px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .2s var(--ease);box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.switch.on .knob{transform:translateX(24px)}
+.seg{display:flex;background:var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg-btn{padding:8px 14px;border-radius:9px;font-weight:800;font-size:14px;color:var(--muted)}
+.seg-btn.on{background:var(--surface);color:var(--primary-deep);box-shadow:var(--shadow-sm)}
+
+.p-tips{list-style:none;display:flex;flex-direction:column;gap:8px}
+.p-tips li{background:var(--surface);border-radius:14px;padding:12px 14px 12px 38px;position:relative;font-size:14px;font-weight:600;box-shadow:var(--shadow-sm)}
+.p-tips li::before{content:"💡";position:absolute;left:12px;top:11px}
+
+.reset-btn{width:100%;margin-top:24px;padding:14px;border-radius:14px;background:var(--orange);color:var(--orange-d);font-weight:800;font-size:15px}
+.p-about{font-size:12px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.5}
+
+/* ---------- Suara (dasbor) ---------- */
+.p-voice{background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow-sm)}
+.p-voice-status{font-weight:800;font-size:15px}
+.p-voice-status.ok{color:var(--primary-deep)}
+.p-voice-status.warn{color:var(--orange-d)}
+.p-voice-note{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+.test-voice-btn{margin-top:12px;width:100%;padding:13px;border-radius:12px;background:var(--primary);color:#fff;font-weight:800;font-size:15px}
+.test-voice-btn:active{transform:scale(.97)}
+
+/* ---------- Suara Hewan (papan bermain) ---------- */
+.explore-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:460px}
+.ex-card{background:var(--surface);border-radius:18px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:var(--shadow-sm)}
+.ex-card:active{transform:scale(.94)}
+.ex-card .emoji-big{font-size:46px}
+.ex-name{font-size:14px;font-weight:800;text-align:center}
+
+/* ---------- Popup lencana ---------- */
+.badge-pop{position:fixed;inset:0;display:grid;place-items:center;z-index:60;pointer-events:none}
+.badge-pop-inner{background:var(--surface);border-radius:24px;padding:28px 36px;text-align:center;box-shadow:var(--shadow);animation:badgeIn .4s var(--ease)}
+.badge-pop.out .badge-pop-inner{animation:badgeOut .4s var(--ease) forwards}
+.badge-pop-ic{font-size:64px}
+.badge-pop-t{font-size:14px;font-weight:800;color:var(--accent-d,#d49a16);letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+.badge-pop-n{font-size:22px;font-weight:900;margin-top:2px}
+@keyframes badgeIn{0%{transform:scale(.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+@keyframes badgeOut{to{transform:scale(.8);opacity:0}}
+
+/* overlay layer untuk confetti/popup */
+#overlay{position:fixed;inset:0;pointer-events:none;z-index:40}
+
+/* hormati preferensi kurangi-gerak dari sistem */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important;transition-duration:.05ms !important}
+  .cele-face{animation:none}
+}
